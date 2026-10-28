@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitaBot 2.0</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-container {
+            width: 45%;
+            margin: 40px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .messages {
+            height: 450px;
+            overflow-y: auto;
+            padding-right: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .msg {
+            margin: 10px 0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 85%;
+        }
+        .user {
+            background: #daf1ff;
+            text-align: right;
+            margin-left: auto;
+        }
+        .bot {
+            background: #f0f0f0;
+            text-align: left;
+        }
+        .input-area {
+            margin-top: 15px;
+            display: flex;
+        }
+        input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            padding: 12px 20px;
+            margin-left: 10px;
+            background: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #004ecc;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <h2>🕉️ GitaBot 2.0</h2>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ask anything related to Bhagavad Gita...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    function addMessage(text, sender) {
+        let msgBox = document.createElement("div");
+        msgBox.className = "msg " + sender;
+        msgBox.innerText = text;
+        document.getElementById("messages").appendChild(msgBox);
+        document.getElementById("messages").scrollTop = 999999;
+    }
+
+    function sendMessage() {
+        let input = document.getElementById("userInput");
+        let text = input.value.trim();
+        if (text === "") return;
+
+        addMessage(text, "user");
+        input.value = "";
+
+        fetch("/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ query: text })
+        })
+        .then(res => res.json())
+        .then(data => addMessage(data.response, "bot"))
+        .catch(err => addMessage("Error: " + err, "bot"));
+    }
+</script>
+
+</body>
+</html>
